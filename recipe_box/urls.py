@@ -15,10 +15,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from recipe_box_app.views  import index
+from recipe_box_app.views  import index, recipe_view
+
 urlpatterns = [
     path('', index),
     path('admin/', admin.site.urls),
+    path('recipe/', recipe_view )
 ]
    
     
