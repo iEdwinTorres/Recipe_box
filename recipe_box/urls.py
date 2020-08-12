@@ -20,7 +20,7 @@ from recipe_box_app.views  import index, recipe_view
 urlpatterns = [
     path('', index),
     path('admin/', admin.site.urls),
-    path('recipe/', recipe_view )
+    path('recipe/<int:recipe_id>/', recipe_view )
 ]
    
     

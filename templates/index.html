@@ -1,7 +1,7 @@
 hey, welcome to my kitchen!
 <ul>
     {%for recipe in recipes %}
-    <li><a href=''>{{recipe}}</a></li>
+    <li><a href='/recipe/{{recipe.id}}'>{{recipe}}</a></li>
     {% endfor %}
 
 </ul> 
