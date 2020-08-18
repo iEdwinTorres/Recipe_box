@@ -1,10 +1,6 @@
-<form action="addauthor/" method="POST">
+<form action="" method="POST">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit">Submit</button>
 </form>
-
-class AddAuthorForm(forms.ModelForm):
-    class Meta:
-        model = Author
-        fields = ('name', 'bio')
+<a href="/">HOME</a>

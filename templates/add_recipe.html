@@ -1,10 +1,6 @@
-<form action="addrecipe/" method="POST">
+<form action="" method="POST">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit">Submit</button>
 </form>
-
-class AddRecipeForm(forms.ModelForm):
-    class Meta:
-        model = Recipe
-        fields = ('name', 'bio')
+<a href="/">HOME</a>
