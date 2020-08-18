@@ -14,3 +14,10 @@ def author_detail_view(request, author_id):
     current_author = Author.objects.filter(id=author_id).first()
     current_recipe = Recipe.objects.filter(author= current_author)
     return render(request, 'author_detail.html', {'recipes': current_recipe, 'author': current_author})
+
+def add_recipe(request):
+    pass
+
+    
+def add_author(request):
+    pass
