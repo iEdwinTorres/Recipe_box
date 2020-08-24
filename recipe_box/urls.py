@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from recipe_box_app.views  import index, recipe_detail_view, author_detail_view, add_author, add_recipe, login_view, logout_view
+from recipe_box_app.views  import index, recipe_detail_view, author_detail_view, add_author, add_recipe, login_view, logout_view, signup_view
 
 urlpatterns = [
     path('', index, name='homepage'),
@@ -24,6 +24,8 @@ urlpatterns = [
     path('addauthor/', add_author),
     path('addrecipe/', add_recipe),
     path('login/', login_view, name="loginview"),
+    path('signup/', signup_view, name="signup"),
+    path('noaccess/', add_author, name="noaccess"),
     path('logout/', logout_view, name="logoutview"),
     path('admin/', admin.site.urls), 
 ]

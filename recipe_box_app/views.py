@@ -1,7 +1,10 @@
 from django.shortcuts import render, redirect, reverse
 from recipe_box_app.models import Author, Recipe
-from recipe_box_app.forms import AddRecipeForm, AddAuthorForm, LoginForm
+from recipe_box_app.forms import AddRecipeForm, AddAuthorForm, LoginForm, SignupForm
 from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.http import HttpResponseRedirect
 
 # Create your views here.
 def index(request):
@@ -17,22 +20,53 @@ def author_detail_view(request, author_id):
     current_recipe = Recipe.objects.filter(author= current_author)
     return render(request, 'author_detail.html', {'recipes': current_recipe, 'author': current_author})
 
+@login_required
 def add_recipe(request):
-    if request.method == 'POST': 
-        form = AddRecipeForm(request.POST)
-        if form.is_valid():
-            form.save()
-    form = AddRecipeForm()
-    return render(request, "add_recipe.html", {"form": form})
+    if request.user.is_staff:
+        if request.method == 'POST': 
+            form = AddRecipeForm(request.POST)
+            if form.is_valid():
+                form.save()
+        form = AddRecipeForm()
+        return render(request, "add_recipe.html", {"form": form})
+    else:
+        if request.method == 'POST': 
+            form = AddRecipeForm(request.POST)
+            if form.is_valid():
+                form.save()
+        form = AddRecipeForm(initial={"author": request.user.author})
+        return render(request, "add_recipe.html", {"form": form})
 
 
+@login_required
 def add_author(request):
-    if request.method == 'POST': 
-        form = AddAuthorForm(request.POST)
+    if request.user.is_staff:
+        if request.method == 'POST': 
+            form = AddAuthorForm(request.POST)
+            if form.is_valid():
+                data = form.cleaned_data
+                new_user = User.objects.create_user(username=data.get('username'), password=data.get('password'))
+                new_author = form.save(commit=False)
+                new_author.user = new_user
+                new_author.save()
+        form = AddAuthorForm()
+        return render(request, "add_author.html", {"form": form})
+    else:
+        return render(request, "no_access.html")
+
+
+def signup_view(request):
+    if request.method =="POST":
+        form = SignupForm(request.POST)
         if form.is_valid():
-            form.save()
-    form = AddAuthorForm()
-    return render(request, "add_author.html", {"form": form})
+            data = form.cleaned_data
+            username = data.get('firstname').lower() + data.get('lastname').lower()
+            new_user = User.objects.create_user(username=username, password=data.get('password'))
+            Author.objects.create(name=data.get('firstname').capitalize() + ' ' + data.get('lastname').capitalize(), bio=data.get('bio'), user=new_user)
+            login(request, new_user)
+            return HttpResponseRedirect(reverse('homepage'))
+    form = SignupForm()
+    return render(request, 'add_author.html',  {'form': form})
 
 
 def login_view(request):
@@ -53,4 +87,8 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect('homepage')
+
+
+
     
+        
