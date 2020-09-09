@@ -1,9 +1,14 @@
-hey, welcome to my kitchen!!
+{% if request.user.is_authenticated%} Hey, welcome to my kitchen, {{ request.user }}!!!
 <a href="/addauthor/">Add Author</a>
-<a href="/addrecipe">Add Recipe</a>
+<a href="/addrecipe/">Add Recipe</a>
+<a href="/logout/">Logout</a>
+
+{% else %} Hey, welcome to my kitchen!!
+<a href="/login/">Login</a>
+{% endif %}
+
 <ul>
     {%for recipe in recipes %}
-    <li><a href='/recipe/{{recipe.id}}'>{{recipe}}</a></li>
+    <li><a href="/recipe/{{recipe.id}}">{{recipe}}</a></li>
     {% endfor %}
-
-</ul> 
+</ul>
