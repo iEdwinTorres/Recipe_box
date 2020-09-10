@@ -15,20 +15,20 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from recipe_box_app.views  import index, recipe_detail_view, author_detail_view, add_author, add_recipe, login_view, logout_view, signup_view
+from recipe_box_app import views
+
 
 urlpatterns = [
-    path('', index, name='homepage'),
-    path('recipe/<int:recipe_id>/', recipe_detail_view),
-    path('author/<int:author_id>/', author_detail_view),
-    path('addauthor/', add_author),
-    path('addrecipe/', add_recipe),
-    path('login/', login_view, name="loginview"),
-    path('signup/', signup_view, name="signup"),
-    path('noaccess/', add_author, name="noaccess"),
-    path('logout/', logout_view, name="logoutview"),
+    path('', views.index, name='homepage'),
+    path('recipe/<int:recipe_id>/', views.recipe_detail_view),
+    path('author/<int:author_id>/', views.author_detail_view),
+    path('addauthor/', views.add_author),
+    path('addrecipe/', views.add_recipe),
+    path('login/', views.login_view, name="loginview"),
+    path('signup/', views.signup_view, name="signup"),
+    path('noaccess/', views.add_author, name="noaccess"),
+    path('logout/', views.logout_view, name="logoutview"),
+    path('favorites/<int:user_id>/', views.favorites_view),
+    path('addfav/<int:recipe_id>/', views.add_favorite),
     path('admin/', admin.site.urls), 
 ]
-    
-   
-    

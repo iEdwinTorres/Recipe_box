@@ -1,6 +1,7 @@
 {% if request.user.is_authenticated%} Hey, welcome to my kitchen, {{ request.user }}!!!
-<a href="/addauthor/">Add Author</a>
-<a href="/addrecipe/">Add Recipe</a>
+<a href="/addauthor/">Add Author</a> | 
+<a href="/addrecipe/">Add Recipe</a> | 
+<a href="/favorites/{{ user.id }}">My Favorites</a> | 
 <a href="/logout/">Logout</a>
 
 {% else %} Hey, welcome to my kitchen!!

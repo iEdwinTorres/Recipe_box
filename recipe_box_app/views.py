@@ -1,24 +1,42 @@
 from django.shortcuts import render, redirect, reverse
-from recipe_box_app.models import Author, Recipe
+from recipe_box_app.models import Author, Recipe, Favorite
 from recipe_box_app.forms import AddRecipeForm, AddAuthorForm, LoginForm, SignupForm
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 
-# Create your views here.
+
 def index(request):
     all_recipes = Recipe.objects.all()
     return render(request, 'index.html', {'recipes':all_recipes})
 
+
 def recipe_detail_view(request, recipe_id):
     recipe = Recipe.objects.filter(id=recipe_id).first()
-    return render(request, 'recipe_detail.html', {'recipe': recipe})
+    favorited_by = Favorite.objects.filter(favorited_recipe=recipe_id)
+    return render(request, 'recipe_detail.html', {'recipe': recipe, "favorited_by": favorited_by})
+
 
 def author_detail_view(request, author_id):
     current_author = Author.objects.filter(id=author_id).first()
     current_recipe = Recipe.objects.filter(author= current_author)
     return render(request, 'author_detail.html', {'recipes': current_recipe, 'author': current_author})
+
+
+def favorites_view(request, user_id):
+    favorites = Favorite.objects.filter(favorited_by=request.user)
+    fav_list = []
+    for favorite in favorites:
+        fav_list.append(favorite.favorited_recipe)
+    return render(request, "favorites.html", {"list": fav_list})
+
+
+def add_favorite(request, recipe_id):
+    fav_recipe = Recipe.objects.filter(id=recipe_id).first()
+    Favorite.objects.create(favorited_by=request.user, favorited_recipe=fav_recipe)
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
 
 @login_required
 def add_recipe(request):
@@ -79,16 +97,9 @@ def login_view(request):
                 login(request, user)
                 return redirect(request.GET.get('next', reverse('homepage')))
     form = LoginForm()
-    return render(request, "login_form.html", {"form": form})
-
-    
+    return render(request, "login_form.html", {"form": form})    
 
 
 def logout_view(request):
     logout(request)
     return redirect('homepage')
-
-
-
-    
-        
