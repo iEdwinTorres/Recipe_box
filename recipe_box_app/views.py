@@ -57,6 +57,27 @@ def add_recipe(request):
 
 
 @login_required
+def edit_recipe(request, recipe_id):
+    recipe = Recipe.objects.get(id=recipe_id)
+    if request.method == "POST":
+        form = AddRecipeForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            recipe.title = data["title"]
+            recipe.author = data["author"]
+            recipe.description = data["description"]
+            recipe.time_required = data["time_required"]
+            recipe.instructions = data["instructions"]
+            recipe.save()
+        return HttpResponseRedirect(reverse("homepage"))
+
+    data = {"title": recipe.title, "author": recipe.author, "description": recipe.description, "time_required": recipe.time_required, "instructions": recipe.instructions}
+
+    form = AddRecipeForm(initial=data)
+    return render(request, "add_recipe.html", {"form": form})
+
+
+@login_required
 def add_author(request):
     if request.user.is_staff:
         if request.method == 'POST': 
