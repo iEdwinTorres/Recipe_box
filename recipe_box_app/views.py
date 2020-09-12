@@ -20,8 +20,8 @@ def recipe_detail_view(request, recipe_id):
 def author_detail_view(request, author_id):
     current_author = Author.objects.filter(id=author_id).first()
     current_recipe = Recipe.objects.filter(author=current_author)
-    favorites = Recipe.objects.filter(author=current_author.favorite.all())
-    return render(request, 'author_detail.html', {'recipes': current_recipe, 'author': current_author, "favorites": favorites})
+    favs_list = current_author.favorite.all()
+    return render(request, 'author_detail.html', {'recipes': current_recipe, 'favs_list': favs_list, 'author':current_author})
 
 
 def add_favorite(request, recipe_id):
@@ -52,24 +52,18 @@ def add_recipe(request):
 @login_required
 def edit_recipe(request, recipe_id):
     recipe = Recipe.objects.get(id=recipe_id)
-    if request.user.is_staff or request.user.id == recipe.author.id:
-        if request.method == "POST":
-            form = AddRecipeForm(request.POST)
-            if form.is_valid():
-                data = form.cleaned_data
-                recipe.title = data["title"]
-                recipe.author = data["author"]
-                recipe.description = data["description"]
-                recipe.time_required = data["time_required"]
-                recipe.instructions = data["instructions"]
-                recipe.save()
-            return HttpResponseRedirect(reverse("homepage"))
-
-    data = {"title": recipe.title, "author": recipe.author, "description": recipe.description, "time_required": recipe.time_required, "instructions": recipe.instructions}
-
+    data = {
+        "title": recipe.title,
+        "author": recipe.author,
+        "description": recipe.description,
+        "time_required": recipe.time_required,
+        "instructions": recipe.instructions
+    }
     if request.user.is_staff or request.user.id == recipe.author.id:
         form = AddRecipeForm(initial=data)
         return render(request, "add_recipe.html", {"form": form})
+    else:
+        return render(request, "no_access.html")
 
 
 @login_required

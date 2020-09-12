@@ -1,15 +1,15 @@
 <h1>{{author.name}}'s Posted Recipes</h1>
 <ul>
     {%for recipe in recipes %}
-    <li><a href='/recipe/{{recipe.id}}'>{{recipe}}</a></li>
+    <li><a href="/recipe/{{recipe.id}}">{{recipe}}</a></li>
     {% endfor %}
-</ul> 
-<br>
-<br>
-<h1>{{request.user}}'s Favorite Recipes</h1>
+</ul>
+<br />
+<br />
+<h1>{{author.name}}'s Favorite Recipes</h1>
+
+{% for item in favs_list%}
 <ul>
-    {{favorites}}
-    {%for item in favorites %}
-    <li><a href='/recipe/{{item.id}}'>{{item.favorite}}</a></li>
-    {% endfor %}
-</ul> 
+    <li><a href="/recipe/{{item.id}}">{{item}}</a></li>
+</ul>
+{% endfor %}
