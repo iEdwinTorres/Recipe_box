@@ -29,7 +29,6 @@ urlpatterns = [
     path("signup/", views.signup_view, name="signup"),
     path("noaccess/", views.add_author, name="noaccess"),
     path("logout/", views.logout_view, name="logoutview"),
-    path("favorites/<int:user_id>/", views.favorites_view),
     path("addfav/<int:recipe_id>/", views.add_favorite),
     path("admin/", admin.site.urls),
 ]

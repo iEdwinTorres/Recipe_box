@@ -5,6 +5,11 @@
     {% endfor %}
 </ul> 
 <br>
-{% if request.user.author.id == author.id %}
-<a href="/favorites/{{ author.id }}/"><button>{{author.name}}'s Favorites</button></a>
-{% endif %}
+<br>
+<h1>{{request.user}}'s Favorite Recipes</h1>
+<ul>
+    {{favorites}}
+    {%for item in favorites %}
+    <li><a href='/recipe/{{item.id}}'>{{item.favorite}}</a></li>
+    {% endfor %}
+</ul> 

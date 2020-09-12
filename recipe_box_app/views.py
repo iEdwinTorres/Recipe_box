@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, reverse
-from recipe_box_app.models import Author, Recipe, Favorite
+from recipe_box_app.models import Author, Recipe
 from recipe_box_app.forms import AddRecipeForm, AddAuthorForm, LoginForm, SignupForm
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
@@ -14,28 +14,21 @@ def index(request):
 
 def recipe_detail_view(request, recipe_id):
     recipe = Recipe.objects.filter(id=recipe_id).first()
-    favorited_by = Favorite.objects.filter(favorited_recipe=recipe_id)
-    return render(request, 'recipe_detail.html', {'recipe': recipe, "favorited_by": favorited_by})
+    return render(request, 'recipe_detail.html', {'recipe': recipe})
 
 
 def author_detail_view(request, author_id):
     current_author = Author.objects.filter(id=author_id).first()
-    current_recipe = Recipe.objects.filter(author= current_author)
-    return render(request, 'author_detail.html', {'recipes': current_recipe, 'author': current_author})
-
-
-def favorites_view(request, user_id):
-    favorites = Favorite.objects.filter(favorited_by=request.user)
-    fav_list = []
-    for favorite in favorites:
-        fav_list.append(favorite.favorited_recipe)
-    return render(request, "favorites.html", {"list": fav_list})
+    current_recipe = Recipe.objects.filter(author=current_author)
+    favorites = Recipe.objects.filter(author=current_author.favorite.all())
+    return render(request, 'author_detail.html', {'recipes': current_recipe, 'author': current_author, "favorites": favorites})
 
 
 def add_favorite(request, recipe_id):
-    fav_recipe = Recipe.objects.filter(id=recipe_id).first()
-    Favorite.objects.create(favorited_by=request.user, favorited_recipe=fav_recipe)
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+    current_user = request.user.author
+    favorites = Recipe.objects.filter(id=recipe_id).first()
+    current_user.favorite.add(favorites)
+    return HttpResponseRedirect(request.META.get("HTTP_REFERER", "redirect_if_referer_not_found"))
 
 
 @login_required
@@ -59,22 +52,24 @@ def add_recipe(request):
 @login_required
 def edit_recipe(request, recipe_id):
     recipe = Recipe.objects.get(id=recipe_id)
-    if request.method == "POST":
-        form = AddRecipeForm(request.POST)
-        if form.is_valid():
-            data = form.cleaned_data
-            recipe.title = data["title"]
-            recipe.author = data["author"]
-            recipe.description = data["description"]
-            recipe.time_required = data["time_required"]
-            recipe.instructions = data["instructions"]
-            recipe.save()
-        return HttpResponseRedirect(reverse("homepage"))
+    if request.user.is_staff or request.user.id == recipe.author.id:
+        if request.method == "POST":
+            form = AddRecipeForm(request.POST)
+            if form.is_valid():
+                data = form.cleaned_data
+                recipe.title = data["title"]
+                recipe.author = data["author"]
+                recipe.description = data["description"]
+                recipe.time_required = data["time_required"]
+                recipe.instructions = data["instructions"]
+                recipe.save()
+            return HttpResponseRedirect(reverse("homepage"))
 
     data = {"title": recipe.title, "author": recipe.author, "description": recipe.description, "time_required": recipe.time_required, "instructions": recipe.instructions}
 
-    form = AddRecipeForm(initial=data)
-    return render(request, "add_recipe.html", {"form": form})
+    if request.user.is_staff or request.user.id == recipe.author.id:
+        form = AddRecipeForm(initial=data)
+        return render(request, "add_recipe.html", {"form": form})
 
 
 @login_required
